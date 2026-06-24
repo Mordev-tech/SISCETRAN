@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+
+</head>
+<body>
+    <header class= "header">
+        <svg class="logo" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+        </svg>
+            <div class="header-text">
+                <h1>SISCETRAN</h1>
+                <small> Formulário de Envio de Ações </small>
+            </div>
+            <div class="login-container">
+                <button class="login-button" id="loginButton">Login</button>    
+                </div>  
+                <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close" id="closeLoginModal">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+
+    </header>
+    <div class="container">
+        <button class="button" id="AbrirAcaoButton">Nova Ação</button>
+        <button class="button" id="AbrirConsultaButton">Consultar Ação</button>
+    </div>
+    <div class="bannerformulario">
+        <span class="edicao-banner"> Editando registro </span>
+        <button class="fechar-banner" id="fecharBanner">X</button>
+    </div>
+    <div class="formulario-container" id="formularioContainer">
+        <h2>Formulário de Ação</h2>
+        <form id="acaoForm">
+            <label for="acao">Ação:</label>
+            <input type="text" id="acao" name="acao" required>
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" required></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>

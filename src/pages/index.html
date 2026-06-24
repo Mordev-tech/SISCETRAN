@@ -46,13 +46,56 @@
     </div>
     <div class="formulario-container" id="formularioContainer">
         <h2>Formulário de Ação</h2>
-        <form id="acaoForm">
-            <label for="acao">Ação:</label>
-            <input type="text" id="acao" name="acao" required>
-            <label for="descricao">Descrição:</label>
-            <textarea id="descricao" name="descricao" required></textarea>
-            <button type="submit">Enviar</button>
-        </form>
+        <div class="formulario-2">
+        <div class="field"><label>O quê?</label><textarea id="f_oque" placeholder="Descreva a ação ou problema"></textarea></div>
+        <div class="field"><label>Por quê?</label><textarea id="f_porque" placeholder="Justificativa ou motivo"></textarea></div>
+        <div class="field"><label>Onde?</label><input type="text" id="f_onde" placeholder="Local de aplicação"></div>
+        <div class="field"><label>Quando?</label><input type="date" id="f_quando"></div>
+        <div class="field"><label>Como?</label><textarea id="f_como" placeholder="Método ou processo"></textarea></div>
+        <div class="field"><label>Quanto?</label><input type="text" id="f_quanto" placeholder="Custo estimado (ex: R$ 1.500,00)"></div>
+      </div>
+      <div class="card">
+        <label> Impacto</label>
+        <select id="f_impacto">
+          <option value="">Selecione o impacto</option>
+          <option value="baixo">Baixo</option>
+          <option value="medio">Médio</option>
+          <option value="alto">Alto</option>
+
+      </div>
+      <div class="actions">
+        <button class="button" id="salvarAcaoButton">Salvar</button>
+        <button class="button" id="limparAcaoButton">↺ Limpar</button>
+        <button class ="button" id="enviarAcaoButton">Enviar</button>
+
+
+      </div>
     </div>
+    <div id="registroView">
+        <div class="table-container">
+            <table id="registroTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>O quê?</th>
+                        <th>Por quê?</th>
+                        <th>Onde?</th>
+                        <th>Quando?</th>
+                        <th>Como?</th>
+                        <th>Quanto?</th>
+                        <th>Impacto</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="registroTableBody">
+                    <!-- Os registros serão inseridos aqui dinamicamente -->
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2026 SISCETRAN. Todos os direitos reservados.</p> 
+        </div>
 </body>
 </html>

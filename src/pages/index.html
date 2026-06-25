@@ -10,11 +10,7 @@
 </head>
 <body>
     <header class= "header">
-        <svg class="logo" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5"></path>
-            <path d="M2 12l10 5 10-5"></path>
-        </svg>
+       <img class="logo" src="../assets/logo.png" alt="Logo SISCETRAN">
             <div class="header-text">
                 <h1>SISCETRAN</h1>
                 <small> Formulário de Envio de Ações </small>
@@ -34,16 +30,15 @@
                 <button type="submit">Entrar</button>
             </form>
         </div>
+        </div>
 
     </header>
     <div class="container">
         <button class="button" id="AbrirAcaoButton">Nova Ação</button>
         <button class="button" id="AbrirConsultaButton">Consultar Ação</button>
+        <button class="button" id="EditarButton">Editar Ação</button>
     </div>
-    <div class="bannerformulario">
-        <span class="edicao-banner"> Editando registro </span>
-        <button class="fechar-banner" id="fecharBanner">X</button>
-    </div>
+  
     <div class="formulario-container" id="formularioContainer">
         <h2>Formulário de Ação</h2>
         <div class="formulario-2">
@@ -61,7 +56,7 @@
           <option value="baixo">Baixo</option>
           <option value="medio">Médio</option>
           <option value="alto">Alto</option>
-
+        </select>
       </div>
       <div class="actions">
         <button class="button" id="salvarAcaoButton">Salvar</button>

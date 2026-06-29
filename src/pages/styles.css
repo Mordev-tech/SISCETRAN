@@ -132,6 +132,9 @@ body{
     flex-direction:column;
 }
 
+#registroView{
+    display:none;
+}
 /* INPUTS */
 
 input,

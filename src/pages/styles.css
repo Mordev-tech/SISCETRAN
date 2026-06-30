@@ -5,45 +5,45 @@
 
 :root {
   --font-size: 15px;
-  --background: #080b12;
-  --foreground: #e8eaf0;
-  --card: #0f1420;
-  --card-foreground: #e8eaf0;
-  --popover: #0f1420;
-  --popover-foreground: #e8eaf0;
-  --primary: #f5a623;
-  --primary-foreground: #080b12;
-  --secondary: #161c2d;
-  --secondary-foreground: #a8b0c4;
-  --muted: #161c2d;
-  --muted-foreground: #6b7590;
-  --accent: #00b4d8;
-  --accent-foreground: #080b12;
+  --background: #ffffff;                  /* Fundo Principal: Branco */
+  --foreground: #1e293b;                  /* Texto Principal: Azul Escuro/Cinza */
+  --card: #f8fafc;                        /* Cards: Branco levemente azulado */
+  --card-foreground: #1e293b;
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
+  --primary: #2563eb;                     /* Cor Principal: Azul Real (antigo amarelo) */
+  --primary-foreground: #ffffff;          /* Texto sobre o Azul: Branco */
+  --secondary: #f1f5f9;                   /* Fundo Secundário: Cinza claro azulado */
+  --secondary-foreground: #475569;        /* Texto Secundário */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #0ea5e9;                      /* Destaque: Azul Celeste */
+  --accent-foreground: #ffffff;
   --destructive: #e63946;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.07);
-  --input: #161c2d;
-  --input-background: #161c2d;
-  --switch-background: #2a3450;
+  --border: #e2e8f0;                      /* Bordas adequadas para fundo claro */
+  --input: #ffffff;
+  --input-background: #ffffff;
+  --switch-background: #cbd5e1;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #f5a623;
+  --ring: #2563eb;                        /* Anel de seleção: Azul */
   --radius: 0.625rem;
 }
 
-/* Suporte à inversão de tema caso adicione a classe .dark via JS */
+/* Suporte à inversão de tema (Modo Escuro baseado em Azul Noturno) */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --background: oklch(0.15 0.05 250);     /* Azul Noturno Muito Escuro */
+  --foreground: oklch(0.95 0.02 250);     /* Texto Claro */
+  --card: oklch(0.20 0.05 250);
+  --card-foreground: oklch(0.95 0.02 250);
+  --primary: oklch(0.60 0.20 250);        /* Azul Vivo para Modo Escuro */
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.25 0.05 250);
+  --secondary-foreground: oklch(0.85 0.02 250);
+  --border: oklch(0.30 0.05 250);
+  --input: oklch(0.25 0.05 250);
+  --ring: oklch(0.60 0.20 250);
 }
 
 /* ==========================================================================
@@ -180,7 +180,7 @@ textarea {
 
 input:focus, textarea:focus, select:focus {
   border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.2);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); /* Sombra ajustada para o azul do foco */
 }
 
 /* Card específico do impacto */
@@ -274,7 +274,7 @@ th {
 }
 
 tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(0, 0, 0, 0.02); /* Ajustado para dar um leve destaque escuro no fundo branco */
 }
 
 /* ==========================================================================
@@ -288,7 +288,7 @@ tr:hover td {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.4); /* Opacidade levemente reduzida para contrastar melhor */
   backdrop-filter: blur(4px);
   align-items: center;
   justify-content: center;
@@ -308,7 +308,7 @@ tr:hover td {
   width: 100%;
   max-width: 420px;
   position: relative;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); /* Sombra suavizada para fundos claros */
 }
 
 .modal-content form {

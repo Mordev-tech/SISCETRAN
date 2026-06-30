@@ -36,7 +36,6 @@
     <div class="container">
         <button class="button" id="AbrirAcaoButton">Nova Ação</button>
         <button class="button" id="AbrirConsultaButton">Consultar Ação</button>
-        <button class="button" id="EditarButton">Editar Ação</button>
     </div>
   
     <div class="formulario-container" id="formularioContainer">
@@ -57,16 +56,24 @@
           <option value="medio">Médio</option>
           <option value="alto">Alto</option>
         </select>
+        <div class="field" style="margin-top:20px;">
+        <label for="f_observacao">Observação</label>
+        <textarea
+            id="f_observacao"
+            rows="4"
+            placeholder="Digite observações adicionais sobre a ação..."
+        ></textarea>
+    </div>
       </div>
       <div class="actions">
-        <button class="button" id="salvarAcaoButton">Salvar</button>
-        <button class="button" id="limparAcaoButton">↺ Limpar</button>
-        <button class ="button" id="enviarAcaoButton">Enviar</button>
-
-
+        <button type="button" class="button" id="salvarAcaoButton">Salvar</button>
+        <button type="button" class="button" id="limparAcaoButton">↺ Limpar</button>
+        <button type="button" class ="button" id="enviarAcaoButton">Enviar</button>
       </div>
+      
+
     </div>
-    <div id="registroView">
+    <div id="registroView" style="display: none;">
         <div class="table-container">
             <table id="registroTable">
                 <thead>

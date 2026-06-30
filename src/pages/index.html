@@ -47,8 +47,7 @@
         <div class="field"><label>Quando?</label><input type="date" id="f_quando"></div>
         <div class="field"><label>Como?</label><textarea id="f_como" placeholder="Método ou processo"></textarea></div>
         <div class="field"><label>Quanto?</label><input type="text" id="f_quanto" placeholder="Custo estimado (ex: R$ 1.500,00)"></div>
-      </div>
-      <div class="card">
+        <div class="field">
         <label> Impacto</label>
         <select id="f_impacto">
           <option value="">Selecione o impacto</option>
@@ -56,18 +55,19 @@
           <option value="medio">Médio</option>
           <option value="alto">Alto</option>
         </select>
-        <div class="field" style="margin-top:20px;">
+      </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
         <label for="f_observacao">Observação</label>
         <textarea
             id="f_observacao"
             rows="4"
             placeholder="Digite observações adicionais sobre a ação..."
         ></textarea>
-    </div>
       </div>
       <div class="actions">
         <button type="button" class="button" id="salvarAcaoButton">Salvar</button>
-        <button type="button" class="button" id="limparAcaoButton">↺ Limpar</button>
+        <button type="button" class="button" id="limparFormulario">↺ Limpar</button>
         <button type="button" class ="button" id="enviarAcaoButton">Enviar</button>
       </div>
       

@@ -6,7 +6,8 @@
   --font-size: 15px;
   --background: #ffffff;                  /* Fundo Principal: Branco */
   --foreground: #1e293b;                  /* Texto Principal: Azul Escuro/Cinza */
-  --card: #f8fafc;                        /* Cards: Branco levemente azulado */
+  --card: #eaedf0;    
+  --top:#ffffff;                    /* Cards: Branco levemente azulado */
   --card-foreground: #1e293b;
   --popover: #ffffff;
   --popover-foreground: #1e293b;
@@ -28,6 +29,7 @@
   --font-weight-normal: 400;
   --ring: #2563eb;                        /* Anel de seleção: Azul */
   --radius: 0.625rem;
+  --clean: #eb4138;                           /* Limpeza de fundo: Amarelo */
 }
 
 /* Suporte à inversão de tema (Modo Escuro baseado em Azul Noturno) */
@@ -99,7 +101,7 @@ label {
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 2rem;
-  background-color: var(--card);
+  background-color: var(--top);
   border-bottom: 1px solid var(--border);
 }
 
@@ -125,10 +127,11 @@ label {
   padding: 0 1.5rem;
   display: flex;
   gap: 1rem;
+  justify-content: center;
 }
 
 .formulario-container, #registroView {
-  max-width: 1200px;
+  max-width: 1700px;
   width: 100%;
   margin: 1.5rem auto;
   padding: 0 1.5rem;
@@ -213,15 +216,15 @@ input:focus, textarea:focus, select:focus {
 
 /* Botões Secundários */
 .button {
-  background-color: var(--secondary);
-  color: var(--foreground);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   border: 1px solid var(--border);
 }
 
 /* Botão de Limpar */
-#limparAcaoButton {
-  background-color: transparent;
-  color: var(--muted-foreground);
+#limparFormulario {
+  background-color: var(--clean);
+  color: var(--accent-foreground);
   border: 1px solid var(--border);
 }
 

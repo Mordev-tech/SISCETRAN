@@ -96,6 +96,7 @@ label {
    ========================================================================== */
 
 /* Header */
+/* Ajuste do Header para permitir centralização absoluta */
 .header {
   display: flex;
   align-items: center;
@@ -103,15 +104,25 @@ label {
   padding: 1.25rem 2rem;
   background-color: var(--top);
   border-bottom: 1px solid var(--border);
+  position: relative; /* Necessário para o texto centralizar em relação ao pai */
+}
+
+.header-text {
+  position: absolute; /* Tira o texto do fluxo normal */
+  left: 50%;          /* Move para o meio da tela */
+  transform: translateX(-50%); /* Puxa o texto de volta exatamente pelo centro */
+  text-align: center;
+  pointer-events: none; /* Garante que o texto não atrapalhe cliques na logo ou botão */
 }
 
 .header-text h1 {
-  margin-bottom: 0rem;
+  font-weight: 800;
+  margin-bottom: 0;
 }
 
-.header-text small {
-  color: var(--muted-foreground);
-  font-size: 0.9rem;
+/* Opcional: Garante que o botão de login fique à direita */
+.login-container {
+  margin-left: auto;
 }
 
 .logo {
@@ -348,4 +359,10 @@ tr:hover td {
 .footer p {
   font-size: 0.9rem;
   color: var(--muted-foreground);
+}
+
+/* Destaque para o nome do sistema no Header */
+.header-text h1 {
+    font-weight: 750; /* 800 é um peso extra-bold para dar bastante destaque */
+    letter-spacing: -0.5px; /* Opcional: melhora a legibilidade em fontes em negrito */
 }

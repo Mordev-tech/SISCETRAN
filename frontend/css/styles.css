@@ -110,7 +110,8 @@ label {
 .header-text {
   position: absolute; /* Tira o texto do fluxo normal */
   left: 50%;          /* Move para o meio da tela */
-  transform: translateX(-50%); /* Puxa o texto de volta exatamente pelo centro */
+  transform: translateX(-150%); /* Puxa o texto de volta exatamente pelo centro */
+  transform: translateY(-150%); /* Ajusta verticalmente se necessário */
   text-align: center;
   pointer-events: none; /* Garante que o texto não atrapalhe cliques na logo ou botão */
 }

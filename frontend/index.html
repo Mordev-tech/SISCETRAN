@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISCETRAN - Painel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-brand">
+            <img class="logo" src="assets/logo.png" alt="Logo SISCETRAN">
+            <div class="header-text">
+                <h1>SISCETRAN</h1>
+                <small>Formulário de Envio de Ações</small>
+            </div>
+        </div>
+        
+        <div class="login-container">
+            <button class="login-button" id="loginButton">Login (Comitê)</button>    
+        </div>  
+
+        <div class="modal" id="loginModal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" id="closeLoginModal">&times;</span>
+                <h2>Login do Conselheiro</h2>
+                <form id="loginForm">
+                    <label for="username">Usuário:</label>
+                    <input type="text" id="username" name="username" required>
+                    
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" name="password" required>
+                    
+                    <button type="submit" class="button">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section" id="heroSection">
+            <!-- ATENÇÃO: background.png não está entre os assets do projeto; adicione o arquivo em assets/ ou remova esta linha -->
+            <img class="background-image" src="assets/background.png" alt="Imagem de Fundo">
+            <div class="hero-text">
+                <h1>Seja Bem-vindo ao SISCETRAN</h1>
+                <h2>Sistema simples de envio de ações para aprovação de conselheiros</h2>
+            </div>
+        </section>
+      
+        <div class="container actions-menu">
+            <button class="button" id="AbrirAcaoButton">Nova Ação</button>
+            <button class="button" id="AbrirConsultaButton">Consultar Ações</button>
+        </div>
+
+        <section class="formulario-container" id="formularioContainer" style="display: none;">
+            <h2>Formulário de Ação</h2>
+            
+            <form id="acaoForm">
+                <div class="formulario-2">
+                    <div class="field">
+                        <label for="f_oque">O quê?</label>
+                        <textarea id="f_oque" placeholder="Descreva a ação ou problema" required></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="f_porque">Por quê?</label>
+                        <textarea id="f_porque" placeholder="Justificativa ou motivo" required></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="f_onde">Onde?</label>
+                        <input type="text" id="f_onde" placeholder="Local de aplicação" required>
+                    </div>
+                    <div class="field">
+                        <label for="f_quando">Quando?</label>
+                        <input type="date" id="f_quando" required>
+                    </div>
+                    <div class="field">
+                        <label for="f_como">Como?</label>
+                        <textarea id="f_como" placeholder="Método ou processo" required></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="f_quanto">Quanto?</label>
+                        <input type="text" id="f_quanto" placeholder="Custo estimado (ex: R$ 1.500,00)">
+                    </div>
+                    <div class="field">
+                        <label for="f_impacto">Impacto</label>
+                        <select id="f_impacto" required>
+                            <option value="">Selecione o impacto</option>
+                            <option value="baixo">Baixo</option>
+                            <option value="medio">Médio</option>
+                            <option value="alto">Alto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top:20px;">
+                    <label for="f_observacao">Observação</label>
+                    <textarea id="f_observacao" rows="4" placeholder="Digite observações adicionais sobre a ação..."></textarea>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="button button-secondary" id="limparFormulario">↺ Limpar</button>
+                    <button type="button" class="button button-success" id="salvarAcaoButton">Salvar Rascunho</button>
+                    <button type="submit" class="button" id="enviarAcaoButton">Enviar para o Comitê</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="registroView" style="display: none; padding: 20px;">
+            <h2>Painel de Acompanhamento</h2>
+            <div class="table-container">
+                <table id="registroTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>O quê?</th>
+                            <th>Onde?</th>
+                            <th>Quando?</th>
+                            <th>Quanto?</th>
+                            <th>Impacto</th>
+                            <th>Status</th> <th>Parecer do Comitê</th> <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registroTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 SISCETRAN. Todos os direitos reservados.</p> 
+    </footer>
+
+</body>
+</html>

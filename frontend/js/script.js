@@ -2,18 +2,26 @@
 // 1. SELEÇÃO DE ELEMENTOS DA INTERFACE
 // ==========================================================================
 const heroSection = document.getElementById("heroSection");
+const acoesTableContainer = document.getElementById("acoesTableContainer");
 const formulario = document.getElementById("formularioContainer");
-const tabela = document.getElementById("registroView");
+const tabelaRegistros = document.getElementById("registroView");
 
-const btnNova = document.getElementById("AbrirAcaoButton");
-const btnConsulta = document.getElementById("AbrirConsultaButton");
-const btnSalvar = document.getElementById("salvarAcaoButton");
-const btnLimpar = document.getElementById("limparFormulario");
-const btnEnviar = document.getElementById("enviarAcaoButton");
+const btnAcoes = document.getElementById("btnAcoes");
+const btnConsultar = document.getElementById("btnConsultar");
+const btnMeusRascunhos = document.getElementById("btnMeusRascunhos");
 
-const corpoTabela = document.getElementById("registroTableBody");
+const btnDetalharSelecionada = document.getElementById("btnDetalharSelecionada");
+const btnVoltarHero = document.getElementById("btnVoltarHero");
 
-// Elementos dos Campos do Formulário para mapeamento simplificado
+const btnSalvarRascunho = document.getElementById("btnSalvarRascunho");
+const btnLimpar = document.getElementById("btnLimpar");
+const btnEnviarComite = document.getElementById("btnEnviarComite");
+const btnVoltarAcoes = document.getElementById("btnVoltarAcoes");
+const btnVoltarAcoesDaConsulta = document.getElementById("btnVoltarAcoesDaConsulta");
+
+const corpoTabelaAcoes = document.getElementById("acoesTableBody");
+const corpoTabelaRegistros = document.getElementById("registroTableBody");
+
 const camposForm = {
     oque: document.getElementById("f_oque"),
     porque: document.getElementById("f_porque"),
@@ -25,58 +33,285 @@ const camposForm = {
     observacao: document.getElementById("f_observacao")
 };
 
+const listaAcoesVinculadasEl = document.getElementById("listaAcoesVinculadas");
+
 // ==========================================================================
 // 2. ESTADO DO SISTEMA
 // ==========================================================================
-let registros = JSON.parse(localStorage.getItem("registros")) || [];
-let idRegistroSendoEditado = null; // Controla se estamos editando um item existente
+const DB_KEY = "siscetran_db";
+let db = carregarBanco();
+let registros = db.registros || [];
+let idRegistroSendoEditado = null;
+let usuarioLogado = carregarSessao();
+let acoesSelecionadas = []; 
+let modoVisualizacao = "geral";
 
 // ==========================================================================
-// 3. FUNÇÕES DE NAVEGAÇÃO (LANDING PAGE vs PAINÉIS)
+// 3. FUNÇÕES DE BANCO DE DADOS E LOGIN
 // ==========================================================================
+function carregarBanco() {
+    const dadosSalvos = JSON.parse(localStorage.getItem(DB_KEY));
+    const registrosLegados = JSON.parse(localStorage.getItem("registros"));
 
-// Quando clica em "Nova Ação"
-btnNova.onclick = () => {
-    heroSection.style.display = "none";      // Esconde a Landing Page
-    formulario.style.display = "block";     // Mostra o formulário
-    tabela.style.display = "none";          // Esconde a tabela
+    if (dadosSalvos && Array.isArray(dadosSalvos.registros)) {
+        return dadosSalvos;
+    }
+
+    const bancoInicial = {
+        usuarios: [
+            { email: "usuario@email.com", senha: "usuario123", role: "usuario" },
+            { email: "comite@email.com", senha: "comite123", role: "comite" },
+            { email: "admin@email.com", senha: "admin123", role: "admin" }
+        ],
+        registros: Array.isArray(registrosLegados) ? registrosLegados : []
+    };
+
+    localStorage.setItem(DB_KEY, JSON.stringify(bancoInicial));
+    return bancoInicial;
+}
+
+function salvarBanco() {
+    db.registros = registros;
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
+}
+
+function carregarSessao() {
+    const usuarioSalvo = localStorage.getItem("usuarioLogadoDados");
+    return usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+}
+
+function salvarSessao(usuario) {
+    usuarioLogado = usuario;
+    localStorage.setItem("usuarioLogadoDados", JSON.stringify(usuario));
+    localStorage.setItem("usuarioLogado", "true");
+}
+
+function limparSessao() {
+    usuarioLogado = null;
+    localStorage.removeItem("usuarioLogadoDados");
+    localStorage.removeItem("usuarioLogado");
+}
+
+function estaLogado() {
+    return Boolean(usuarioLogado);
+}
+
+function atualizarVisibilidadeMenu() {
+    if (btnMeusRascunhos) {
+        btnMeusRascunhos.style.display = estaLogado() ? "inline-flex" : "none";
+    }
+}
+
+function exigirLogin() {
+    if (!estaLogado()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Acesso restrito',
+            text: 'Faça login para acessar esta função.',
+            confirmButtonColor: '#2563eb'
+        });
+        return false;
+    }
+    return true;
+}
+
+// ==========================================================================
+// 4. NAVEGAÇÃO ENTRE TELAS
+// ==========================================================================
+btnAcoes.onclick = () => {
+    if (!exigirLogin()) return;
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "block";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "none";
+    renderizarTabelaAcoes();
 };
 
-// Quando clica em "Consultar Ação"
-btnConsulta.onclick = () => {
-    heroSection.style.display = "none";      // Esconde a Landing Page
-    formulario.style.display = "none";      // Esconde o formulário
-    tabela.style.display = "block";         // Mostra a tabela
-    atualizarTabela();
+if (btnVoltarHero) btnVoltarHero.onclick = () => {
+    heroSection.style.display = "block";
+    acoesTableContainer.style.display = "none";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "none";
+    limparSelecao();
 };
 
-// Retornar para a Landing Page principal ao clicar na logo/nome do sistema
+btnConsultar.onclick = () => {
+    if (!exigirLogin()) return;
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "none";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "block";
+    modoVisualizacao = "geral";
+    atualizarTabelaRegistros();
+};
+
+btnVoltarAcoesDaConsulta.onclick = () => {
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "block";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "none";
+    renderizarTabelaAcoes();
+};
+
+btnMeusRascunhos.onclick = () => {
+    if (!exigirLogin()) return;
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "none";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "block";
+    modoVisualizacao = "meus_rascunhos";
+    atualizarTabelaRegistros();
+};
+
 const brandClick = document.querySelector(".header-brand");
 if (brandClick) {
     brandClick.style.cursor = "pointer";
     brandClick.onclick = () => {
-        heroSection.style.display = "block"; // Reexibe a Landing Page de Boas-vindas
+        heroSection.style.display = "block";
+        acoesTableContainer.style.display = "none";
         formulario.style.display = "none";
-        tabela.style.display = "none";
+        tabelaRegistros.style.display = "none";
+        limparSelecao();
     };
 }
 
 // ==========================================================================
-// 4. FUNÇÕES AUXILIARES E VALIDAÇÕES
+// 5. CONTROLE DO BOTÃO FLUTUANTE E RENDERIZAÇÃO
 // ==========================================================================
+const floatingBtn = document.getElementById('floatingDetalharBtn');
+const btnDetalhar = document.getElementById('btnDetalharSelecionada');
 
-// Gera ID único baseado no timestamp atual
+function atualizarBotaoFlutuante() {
+    const checkboxes = document.querySelectorAll('.acao-checkbox:checked');
+    if (checkboxes.length > 0) {
+        floatingBtn.classList.add('visible');
+    } else {
+        floatingBtn.classList.remove('visible');
+    }
+}
+
+function renderizarTabelaAcoes() {
+    corpoTabelaAcoes.innerHTML = "";
+
+    if (!window.acoesEstrategicas || window.acoesEstrategicas.length === 0) {
+        corpoTabelaAcoes.innerHTML = `<tr><td colspan="7" class="table-empty-state">Nenhuma ação estratégica encontrada</td></tr>`;
+        return;
+    }
+
+    window.acoesEstrategicas.forEach((acao) => {
+        const linha = document.createElement("tr");
+        linha.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="acao-checkbox" value="${acao.id}">
+            </td>
+            <td><strong>${acao.id}</strong></td>
+            <td>${acao.diretriz}</td>
+            <td><span class="badge-${acao.prazo.toLowerCase()}">${acao.prazo}</span></td>
+            <td>${acao.meta}</td>
+            <td>${acao.indicador}</td>
+            <td>${acao.responsavel}</td>
+        `;
+        corpoTabelaAcoes.appendChild(linha);
+    });
+
+    document.querySelectorAll('.acao-checkbox').forEach(cb => {
+        cb.onchange = function() {
+            atualizarBotaoFlutuante();
+        };
+    });
+
+    floatingBtn.classList.remove('visible');
+}
+
+// ==========================================================================
+// 6. DETALHAR MÚLTIPLAS AÇÕES SELECIONADAS
+// ==========================================================================
+btnDetalhar.onclick = () => {
+    if (!exigirLogin()) return;
+    
+    const checkboxes = document.querySelectorAll('.acao-checkbox:checked');
+    if (checkboxes.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Nenhuma ação selecionada',
+            text: 'Por favor, selecione pelo menos uma ação estratégica.',
+            confirmButtonColor: '#2563eb'
+        });
+        return;
+    }
+
+    acoesSelecionadas = [];
+    checkboxes.forEach(cb => {
+        const acao = window.acoesEstrategicas.find(a => a.id === cb.value);
+        if (acao) acoesSelecionadas.push(acao);
+    });
+
+    preencherFormularioComAcoes(acoesSelecionadas);
+    
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "none";
+    formulario.style.display = "block";
+    tabelaRegistros.style.display = "none";
+
+    floatingBtn.classList.remove('visible');
+};
+
+// ==========================================================================
+// 7. FUNÇÕES DO FORMULÁRIO (MULTI-AÇÃO)
+// ==========================================================================
+function preencherFormularioComAcoes(acoes) {
+    idRegistroSendoEditado = null;
+
+    listaAcoesVinculadasEl.innerHTML = "";
+    acoes.forEach(acao => {
+        const item = document.createElement("div");
+        item.className = "lista-acoes-item";
+        item.innerHTML = `<span>✓ ${acao.id}</span> <span>${acao.diretriz}</span>`;
+        listaAcoesVinculadasEl.appendChild(item);
+    });
+
+    camposForm.oque.value = "";
+    camposForm.porque.value = "";
+    camposForm.como.value = "";
+    camposForm.quando.value = "";
+    camposForm.onde.value = "";
+    camposForm.quanto.value = "";
+    camposForm.impacto.value = "";
+    camposForm.observacao.value = "";
+}
+
+function limparSelecao() {
+    document.querySelectorAll('.acao-checkbox').forEach(cb => cb.checked = false);
+    acoesSelecionadas = [];
+    listaAcoesVinculadasEl.innerHTML = "";
+}
+
+function limparFormulario() {
+    Object.values(camposForm).forEach(campo => campo.value = "");
+    idRegistroSendoEditado = null;
+    limparSelecao();
+}
+
+btnLimpar.onclick = limparFormulario;
+
+btnVoltarAcoes.onclick = () => {
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "block";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "none";
+    limparFormulario();
+    renderizarTabelaAcoes();
+};
+
 function gerarID() {
     return `${Date.now()}-${Math.floor(Math.random() * 100)}`;
 }
 
-// Verifica se os campos obrigatórios estão preenchidos
 function validarFormulario() {
     const camposObrigatorios = ['oque', 'porque', 'como', 'quando', 'onde', 'quanto', 'impacto'];
     return camposObrigatorios.every(chave => camposForm[chave].value.trim() !== "");
 }
 
-// Captura os dados estruturados da tela
 function capturarDadosFormulario() {
     return {
         oque: camposForm.oque.value,
@@ -90,155 +325,281 @@ function capturarDadosFormulario() {
     };
 }
 
-// Limpa todos os campos e reseta o estado de edição
-function limparFormulario() {
-    Object.values(camposForm).forEach(campo => campo.value = "");
-    idRegistroSendoEditado = null; 
+function gerarEstruturaAcoesVinculadas(acoes) {
+    return acoes.map(a => ({
+        id: a.id,
+        diretriz: a.diretriz
+    }));
 }
-btnLimpar.onclick = limparFormulario;
 
 // ==========================================================================
-// 5. OPERAÇÕES DO FORMULÁRIO (SALVAR / ENVIAR)
+// 8. OPERAÇÕES DO FORMULÁRIO (SALVAR E ENVIAR)
 // ==========================================================================
+btnSalvarRascunho.onclick = async () => {
+    if (!exigirLogin()) return;
 
-// Salvar / Atualizar Registro como Rascunho
-btnSalvar.onclick = () => {
     if (!validarFormulario()) {
-        alert("Por favor, preencha todos os campos obrigatórios antes de salvar!");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos obrigatórios',
+            text: 'Por favor, preencha todos os campos obrigatórios.',
+            confirmButtonColor: '#2563eb'
+        });
+        return;
+    }
+
+    if (acoesSelecionadas.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Ações não selecionadas',
+            text: 'Selecione pelo menos uma ação estratégica.',
+            confirmButtonColor: '#2563eb'
+        });
         return;
     }
 
     const dadosAcao = capturarDadosFormulario();
 
     if (idRegistroSendoEditado) {
-        // Modo Edição
+        const index = registros.findIndex(reg => reg.id === idRegistroSendoEditado);
+        if (index !== -1) {
+            registros[index] = {
+                ...registros[index],
+                ...dadosAcao,
+                status: "Rascunho",
+                dataEdicao: new Date().toLocaleString(),
+                acoesEstrategicas: gerarEstruturaAcoesVinculadas(acoesSelecionadas) 
+            };
+            Swal.fire({
+                icon: 'success',
+                title: 'Rascunho salvo!',
+                text: 'O rascunho foi atualizado com sucesso.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        idRegistroSendoEditado = null;
+    } else {
+        const novoRegistro = {
+            id: gerarID(),
+            dataCriacao: new Date().toLocaleString(),
+            status: "Rascunho",
+            comentarioComite: "-",
+            criadoPor: usuarioLogado.email,
+            acoesEstrategicas: gerarEstruturaAcoesVinculadas(acoesSelecionadas),
+            ...dadosAcao
+        };
+        registros.push(novoRegistro);
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Rascunho salvo!',
+            text: `ID: ${novoRegistro.id}. Você pode continuar editando.`,
+            timer: 3000,
+            showConfirmButton: false
+        });
+        idRegistroSendoEditado = novoRegistro.id;
+    }
+
+    salvarBanco();
+};
+
+btnEnviarComite.onclick = async () => {
+    if (!exigirLogin()) return;
+
+    if (!validarFormulario()) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos obrigatórios',
+            text: 'Por favor, preencha todos os campos obrigatórios.',
+            confirmButtonColor: '#2563eb'
+        });
+        return;
+    }
+
+    if (acoesSelecionadas.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Ações não selecionadas',
+            text: 'Selecione pelo menos uma ação estratégica.',
+            confirmButtonColor: '#2563eb'
+        });
+        return;
+    }
+
+    const result = await Swal.fire({
+        title: 'Confirmar envio',
+        text: 'Deseja enviar o detalhamento para a aprovação dos conselheiros?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#e63946',
+        confirmButtonText: 'Sim, enviar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) return;
+
+    const dadosAcao = capturarDadosFormulario();
+
+    if (idRegistroSendoEditado) {
         const index = registros.findIndex(reg => reg.id === idRegistroSendoEditado);
         if (index !== -1) {
             registros[index] = { 
                 ...registros[index], 
-                ...dadosAcao,
-                dataEdicao: new Date().toLocaleString() 
+                ...dadosAcao, 
+                status: "Enviado",
+                acoesEstrategicas: gerarEstruturaAcoesVinculadas(acoesSelecionadas)
             };
-            alert("Alterações salvas com sucesso!");
         }
-        idRegistroSendoEditado = null; // Bug corrigido aqui (estava idRegistroSendoEditated)
+        idRegistroSendoEditado = null;
     } else {
-        // Modo Criação de Rascunho
-        dadosAcao.id = gerarID();
-        dadosAcao.dataCriacao = new Date().toLocaleString();
-        dadosAcao.status = "Rascunho";
-        dadosAcao.comentarioComite = "-"; // Inicializa o campo do comitê
-        
-        registros.push(dadosAcao);
-        alert(`Rascunho salvo com sucesso! ID: ${dadosAcao.id}`);
+        const novoRegistro = {
+            id: gerarID(),
+            dataCriacao: new Date().toLocaleString(),
+            status: "Enviado",
+            comentarioComite: "-",
+            criadoPor: usuarioLogado.email,
+            acoesEstrategicas: gerarEstruturaAcoesVinculadas(acoesSelecionadas),
+            ...dadosAcao
+        };
+        registros.push(novoRegistro);
     }
 
-    localStorage.setItem("registros", JSON.stringify(registros));
-    limparFormulario();
-};
-
-// Enviar Ação para os Conselheiros
-btnEnviar.onclick = () => {
-    if (!validarFormulario()) {
-        alert("Por favor, preencha todos os campos obrigatórios antes de enviar!");
-        return;
-    }
-
-    if (confirm("Deseja enviar esta ação para a aprovação dos conselheiros?")) {
-        const dadosAcao = capturarDadosFormulario();
-        
-        if (idRegistroSendoEditado) {
-            const index = registros.findIndex(reg => reg.id === idRegistroSendoEditado);
-            if (index !== -1) {
-                registros[index] = { ...registros[index], ...dadosAcao, status: "Enviado" };
-            }
-            idRegistroSendoEditado = null;
-        } else {
-            dadosAcao.id = gerarID();
-            dadosAcao.dataCriacao = new Date().toLocaleString();
-            dadosAcao.status = "Enviado";
-            dadosAcao.comentarioComite = "-";
-            registros.push(dadosAcao);
-        }
-
-        localStorage.setItem("registros", JSON.stringify(registros));
-        alert("Ação enviada com sucesso!");
-        limparFormulario();
-    }
-};
-
-// ==========================================================================
-// 6. CONTROLE E RENDERIZAÇÃO DA TABELA (COM REGRAS DO COMITÊ)
-// ==========================================================================
-
-function atualizarTabela() {
-    corpoTabela.innerHTML = "";
+    salvarBanco();
+    Swal.fire({
+        icon: 'success',
+        title: 'Ação enviada!',
+        text: 'O detalhamento foi enviado para análise.',
+        timer: 2000,
+        showConfirmButton: false
+    });
     
-    // Verifica se o conselheiro está logado no momento
-    const esComite = localStorage.getItem('usuarioLogado') === 'true';
+    heroSection.style.display = "none";
+    acoesTableContainer.style.display = "block";
+    formulario.style.display = "none";
+    tabelaRegistros.style.display = "none";
+    limparFormulario();
+    renderizarTabelaAcoes();
+};
 
-    if (registros.length === 0) {
-        corpoTabela.innerHTML = `<tr><td colspan="9" style="text-align: center;">Nenhum registro encontrado</td></tr>`;
+// ==========================================================================
+// 9. TABELA DE REGISTROS (CONSULTA VISUAL E GERENCIAMENTO)
+// ==========================================================================
+function atualizarTabelaRegistros() {
+    corpoTabelaRegistros.innerHTML = "";
+
+    const esComite = Boolean(usuarioLogado && (usuarioLogado.role === 'comite' || usuarioLogado.role === 'admin'));
+
+    let dadosFiltrados = registros;
+
+    if (modoVisualizacao === "meus_rascunhos" && usuarioLogado) {
+        dadosFiltrados = registros.filter(r => r.criadoPor === usuarioLogado.email && r.status === "Rascunho");
+    }
+
+    if (dadosFiltrados.length === 0) {
+        corpoTabelaRegistros.innerHTML = `<tr><td colspan="9" class="table-empty-state">Nenhum registro encontrado</td></tr>`;
         return;
     }
 
-    registros.forEach((registro, index) => {
+    dadosFiltrados.forEach((registro) => {
         const linha = document.createElement("tr");
-        
-        // Define os botões de ação baseado em quem está olhando a tabela
         let botoesAcao = "";
-        
+
+        // Lógica de permissões:
+        // 1. Comitê: vê botões de Aprovar/Reprovar apenas em registros "Enviado".
+        // 2. Usuário dono do Rascunho: vê botões de Editar/Excluir APENAS no modo "meus_rascunhos".
+        // 3. Consulta Geral (btnConsultar): Apenas visualização para usuários comuns.
+
         if (esComite) {
-            // Se for Conselheiro e a ação estiver pendente ("Enviado")
             if (registro.status === "Enviado") {
                 botoesAcao = `
                     <button onclick="avaliarAcao('${registro.id}', 'Aprovado')" class="button-aprovar" title="Aprovar">Aprovar</button>
                     <button onclick="avaliarAcao('${registro.id}', 'Reprovado')" class="button-reprovar" title="Reprovar">Reprovar</button>
                 `;
             } else {
-                botoesAcao = `<span style="font-size:12px; color:gray;">Avaliado</span>`;
+                botoesAcao = `<span class="table-status-text">Avaliado</span>`;
             }
         } else {
-            // Se for Usuário Comum, ele só edita se for Rascunho
-            if (registro.status === "Rascunho") {
+            // Usuário comum
+            if (modoVisualizacao === "meus_rascunhos" && registro.criadoPor === usuarioLogado?.email) {
                 botoesAcao = `
                     <button onclick="editarRegistro('${registro.id}')" class="button-editar" title="Editar">✏️</button>
                     <button onclick="excluirRegistro('${registro.id}')" class="button-excluir" title="Excluir">🗑️</button>
                 `;
             } else {
-                botoesAcao = `<span style="font-size:12px; color:gray;">Bloqueado em Análise</span>`;
+                // Se for consulta geral, não mostra botões para o usuário comum
+                botoesAcao = `<span class="table-status-text">${registro.status === 'Rascunho' ? 'Rascunho' : 'Em Análise'}</span>`;
             }
         }
 
+        // Renderização das Ações Vinculadas (Compatibilidade)
+        let colunaAcoes = "";
+        if (registro.acoesEstrategicas && Array.isArray(registro.acoesEstrategicas)) {
+            // Novo formato
+            colunaAcoes = registro.acoesEstrategicas.map(a => 
+                `<div><strong>${a.id}</strong> ${a.diretriz}</div>`
+            ).join('');
+        } else if (registro.acaoEstrategicaId) {
+            // Formato antigo
+            colunaAcoes = `<div><strong>${registro.acaoEstrategicaId}</strong> ${registro.acaoEstrategicaDiretriz || ''}</div>`;
+        } else {
+            colunaAcoes = "-";
+        }
+
         linha.innerHTML = `
-            <td>${registro.id || `ID-${index + 1}`}</td>
+            <td>${registro.id || `ID-${Math.random().toString(36).substr(2, 4)}`}</td>
+            <td>${colunaAcoes}</td>
             <td>${registro.oque}</td>
             <td>${registro.onde}</td>
             <td>${formatarData(registro.quando)}</td>
-            <td>${registro.quanto}</td>
             <td>${formatarImpacto(registro.impacto)}</td>
             <td><span class="badge-${registro.status.toLowerCase()}">${registro.status}</span></td>
             <td><em>${registro.comentarioComite || "-"}</em></td>
             <td>${botoesAcao}</td>
         `;
-        corpoTabela.appendChild(linha);
+        corpoTabelaRegistros.appendChild(linha);
     });
 }
 
-// Nova função para a Tomada de Decisão do Comitê (Aprovar/Reprovar + Comentário)
-window.avaliarAcao = function(id, novoStatus) {
+// ==========================================================================
+// 10. AÇÕES DO COMITÊ E UTILITÁRIOS
+// ==========================================================================
+window.avaliarAcao = async function(id, novoStatus) {
     const index = registros.findIndex(reg => reg.id === id);
     if (index === -1) return;
 
-    const parecer = prompt(`Digite um parecer/comentário para esta ação (${novoStatus}):`);
-    if (parecer === null) return; // Cancelou o prompt
+    const { value: parecer } = await Swal.fire({
+        title: `Avaliar ação - ${novoStatus}`,
+        input: 'textarea',
+        inputLabel: 'Digite seu parecer/comentário',
+        inputPlaceholder: 'Seu parecer sobre esta ação...',
+        showCancelButton: true,
+        confirmButtonColor: novoStatus === 'Aprovado' ? '#2ecc71' : '#e63946',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: novoStatus === 'Aprovado' ? '✅ Aprovar' : '❌ Reprovar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value || value.trim() === '') {
+                return 'Por favor, digite um parecer!';
+            }
+        }
+    });
+
+    if (parecer === null) return;
 
     registros[index].status = novoStatus;
-    registros[index].comentarioComite = parecer.trim() || `Ação ${novoStatus} pelo comitê.`;
+    registros[index].comentarioComite = parecer.trim();
 
-    localStorage.setItem("registros", JSON.stringify(registros));
-    alert(`Ação atualizada para ${novoStatus} com sucesso!`);
-    atualizarTabela();
+    salvarBanco();
+    Swal.fire({
+        icon: 'success',
+        title: `Ação ${novoStatus}!`,
+        text: `A ação foi ${novoStatus.toLowerCase()} com sucesso.`,
+        timer: 2000,
+        showConfirmButton: false
+    });
+    atualizarTabelaRegistros();
 };
 
 function formatarData(data) {
@@ -256,18 +617,51 @@ function formatarImpacto(impacto) {
     return cores[impacto] || impacto;
 }
 
-window.excluirRegistro = function(id) {
+window.excluirRegistro = async function(id) {
     const index = registros.findIndex(reg => reg.id === id);
-    if (index !== -1 && confirm(`Deseja realmente excluir o rascunho ID: ${id}?`)) {
+    if (index === -1) return;
+
+    const result = await Swal.fire({
+        title: 'Confirmar exclusão',
+        text: `Deseja realmente excluir o rascunho ID: ${id}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e63946',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
         registros.splice(index, 1);
-        localStorage.setItem("registros", JSON.stringify(registros));
-        atualizarTabela();
+        salvarBanco();
+        Swal.fire({
+            icon: 'success',
+            title: 'Excluído!',
+            text: 'O rascunho foi removido.',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        atualizarTabelaRegistros();
     }
 };
 
 window.editarRegistro = function(id) {
     const registro = registros.find(reg => reg.id === id);
     if (!registro) return;
+
+    if (registro.acoesEstrategicas && Array.isArray(registro.acoesEstrategicas)) {
+        acoesSelecionadas = registro.acoesEstrategicas.map(acaoRef => {
+            return window.acoesEstrategicas.find(a => a.id === acaoRef.id) || acaoRef;
+        });
+    } else if (registro.acaoEstrategicaId) {
+        const acao = window.acoesEstrategicas.find(a => a.id === registro.acaoEstrategicaId);
+        acoesSelecionadas = acao ? [acao] : [{ id: registro.acaoEstrategicaId, diretriz: registro.acaoEstrategicaDiretriz || "" }];
+    } else {
+        acoesSelecionadas = [];
+    }
+
+    preencherFormularioComAcoes(acoesSelecionadas);
 
     camposForm.oque.value = registro.oque || "";
     camposForm.porque.value = registro.porque || "";
@@ -277,18 +671,25 @@ window.editarRegistro = function(id) {
     camposForm.quanto.value = registro.quanto || "";
     camposForm.impacto.value = registro.impacto || "";
     camposForm.observacao.value = registro.observacao || "";
-    
+
     idRegistroSendoEditado = registro.id;
-    
+
     heroSection.style.display = "none";
+    acoesTableContainer.style.display = "none";
     formulario.style.display = "block";
-    tabela.style.display = "none";
-    
-    alert("Rascunho carregado. Modifique as informações e clique em 'Salvar Rascunho' ou 'Enviar para o Comitê'.");
+    tabelaRegistros.style.display = "none";
+
+    Swal.fire({
+        icon: 'info',
+        title: 'Rascunho carregado',
+        text: 'Modifique as informações.',
+        timer: 2500,
+        showConfirmButton: false
+    });
 };
 
 // ==========================================================================
-// 7. INICIALIZAÇÃO E EVENTOS DE LOGIN (DOM COMPLETO)
+// 11. LOGIN (Inalterado)
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('loginButton');
@@ -296,21 +697,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeLoginModal = document.getElementById('closeLoginModal');
     const loginForm = document.getElementById('loginForm');
 
-    // Checagem persistente de login ao recarregar a página
-    if (localStorage.getItem('usuarioLogado') === 'true' && loginButton) {
+    if (usuarioLogado && loginButton) {
         loginButton.textContent = 'Logout';
-        loginButton.style.backgroundColor = '#e74c3c';
+        loginButton.classList.add('is-logged-in');
     }
 
     if (loginButton && loginModal && closeLoginModal) {
-        loginButton.onclick = () => {
-            if (localStorage.getItem('usuarioLogado') === 'true') {
-                // Fazer Logout
-                localStorage.removeItem('usuarioLogado');
-                loginButton.textContent = 'Login (Comitê)';
-                loginButton.style.backgroundColor = '';
-                alert('Você saiu do modo de visualização do Comitê.');
-                if (tabela.style.display === "block") atualizarTabela();
+        loginButton.onclick = async () => {
+            if (estaLogado()) {
+                const result = await Swal.fire({
+                    title: 'Sair da sessão?',
+                    text: 'Você tem certeza que deseja fazer logout?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e63946',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, sair',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (result.isConfirmed) {
+                    limparSessao();
+                    loginButton.textContent = 'Login';
+                    loginButton.classList.remove('is-logged-in');
+                    atualizarVisibilidadeMenu();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Logout realizado!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    if (tabelaRegistros.style.display === "block") atualizarTabelaRegistros();
+                }
             } else {
                 loginModal.style.display = 'flex';
             }
@@ -319,58 +737,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (loginForm) {
-        loginForm.onsubmit = (e) => {
+        loginForm.onsubmit = async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('username').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
-            
-            if (username === 'admin' && password === 'admin') {
-                alert('Login de Conselheiro realizado!');
-                localStorage.setItem('usuarioLogado', 'true');
+
+            const usuarioEncontrado = db.usuarios.find((u) => u.email === email && u.senha === password);
+
+            if (usuarioEncontrado) {
+                salvarSessao(usuarioEncontrado);
                 loginModal.style.display = 'none';
                 loginButton.textContent = 'Logout';
-                loginButton.style.backgroundColor = '#e74c3c';
-                
-                // Força atualização da tabela caso ela esteja aberta
-                if (tabela.style.display === "block") atualizarTabela();
-                
-                // Limpa o form de login
+                loginButton.classList.add('is-logged-in');
+                atualizarVisibilidadeMenu();
+
+                if (tabelaRegistros.style.display === "block") atualizarTabelaRegistros();
+
                 document.getElementById('username').value = "";
                 document.getElementById('password').value = "";
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login realizado!',
+                    text: `Bem-vindo, ${usuarioEncontrado.email}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             } else {
-                alert('Usuário ou senha incorretos!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro no login',
+                    text: 'E-mail ou senha incorretos!',
+                    confirmButtonColor: '#2563eb'
+                });
             }
         };
     }
 
-    // Configura a visualização da Landing Page padrão ao abrir o site
+    // Inicialização
     heroSection.style.display = 'block';
+    acoesTableContainer.style.display = 'none';
     formulario.style.display = 'none';
-    tabela.style.display = 'none';
+    tabelaRegistros.style.display = 'none';
+    atualizarVisibilidadeMenu();
 });
-
-// Estilização injetada para os novos elementos da tabela
-const styleSheet = document.createElement("style");
-styleSheet.textContent = `
-    .button-excluir, .button-editar, .button-aprovar, .button-reprovar {
-        color: white; border: none; border-radius: 4px; padding: 5px 10px; margin: 2px; cursor: pointer; font-size: 13px; transition: background 0.2s ease;
-    }
-    .button-excluir { background-color: #e74c3c; }
-    .button-excluir:hover { background-color: #c0392b; }
-    .button-editar { background-color: #3498db; }
-    .button-editar:hover { background-color: #2980b9; }
-    .button-aprovar { background-color: #2ecc71; }
-    .button-aprovar:hover { background-color: #27ae60; }
-    .button-reprovar { background-color: #e67e22; }
-    .button-reprovar:hover { background-color: #d35400; }
-    
-    /* Badges de Status */
-    .badge-rascunho, .badge-enviado, .badge-aprovado, .badge-reprovado {
-        padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase;
-    }
-    .badge-rascunho { background-color: #95a5a6; }
-    .badge-enviado { background-color: #f1c40f; color: #2c3e50; }
-    .badge-aprovado { background-color: #2ecc71; }
-    .badge-reprovado { background-color: #e74c3c; }
-`;
-document.head.appendChild(styleSheet);

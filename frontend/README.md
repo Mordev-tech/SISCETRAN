@@ -19,41 +19,6 @@ frontend/
 └── README.md
 ```
 
-## O que foi corrigido nesta limpeza
-
-1. **Script não carregava.** `index.html` referenciava `<script src="app.js">`, mas o
-   arquivo real se chama `script.js`. Isso significa que, no zip original, **nenhum
-   JavaScript rodava** ao abrir a página. Corrigido para `js/script.js`.
-2. **Caminho da logo quebrado** após a reorganização de pastas — ajustado para `assets/logo.png`.
-3. **Asset ausente:** `background.png` é referenciado no HTML mas não existe em `assets/`.
-   Deixei um comentário no HTML sinalizando isso — falta adicionar o arquivo ou remover a tag.
-4. **Bug de status "Reprovar" vs "Reprovado".** Ao reprovar uma ação, o código gravava o
-   status como `"Reprovar"` (verbo), mas o CSS injetado esperava `"Reprovado"` (particípio,
-   no mesmo padrão de `"Aprovado"`). Resultado: o badge de itens reprovados ficava **sem
-   cor de fundo definida**, praticamente invisível na tabela. Corrigido em dois pontos
-   (o valor do status e a lista de seletores do CSS injetado).
-
-## Pontos de atenção importantes (não corrigidos, dependem de decisão sua)
-
-Estes não são bugs de código — são características do estágio atual do protótipo que
-merecem atenção antes de qualquer uso real, especialmente por ser um sistema de
-instituição pública:
-
-- **Não há persistência real.** Todos os dados (`registros`) ficam em `localStorage` do
-  navegador. Isso significa que os dados são por navegador/máquina — não são
-  compartilhados entre usuários, e um simples "limpar dados do navegador" apaga tudo.
-  Isso é esperado num protótipo, mas é a principal razão para a migração ao backend
-  Spring Boot + PostgreSQL que vocês já estão desenhando.
-- **Login simulado e inseguro.** O acesso "Comitê" usa usuário/senha fixos no próprio
-  JavaScript (`admin` / `admin`), visíveis a qualquer pessoa que abra o código-fonte da
-  página. Não há hashing, não há sessão real, não há backend validando nada — é só uma
-  flag `localStorage.usuarioLogado`. Isso não deve ir para produção; é exatamente o tipo
-  de coisa que o RBAC com Spring Security + JWT (mencionado no projeto do backend) resolve
-  de verdade.
-- **Sem validação/sanitização de entrada.** Os dados do formulário vão direto para o HTML
-  da tabela (`innerHTML`) sem qualquer escape, o que abre espaço para XSS caso o conteúdo
-  digitado contenha tags/scripts. Num backend real isso deve ser tratado tanto no
-  front-end quanto no back-end.
 
 ## O que este front-end faz hoje
 

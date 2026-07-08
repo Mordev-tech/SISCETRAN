@@ -522,15 +522,23 @@ function atualizarTabelaRegistros() {
             }
         } else {
             // Usuário comum
-            if (modoVisualizacao === "meus_rascunhos" && registro.criadoPor === usuarioLogado?.email) {
-                botoesAcao = `
-                    <button onclick="editarRegistro('${registro.id}')" class="button-editar" title="Editar">✏️</button>
-                    <button onclick="excluirRegistro('${registro.id}')" class="button-excluir" title="Excluir">🗑️</button>
-                `;
-            } else {
-                // Se for consulta geral, não mostra botões para o usuário comum
-                botoesAcao = `<span class="table-status-text">${registro.status === 'Rascunho' ? 'Rascunho' : 'Em Análise'}</span>`;
-            }
+           if (modoVisualizacao === "meus_rascunhos" && registro.criadoPor === usuarioLogado?.email) {
+
+    botoesAcao = `
+        <button onclick="editarRegistro('${registro.id}')" class="button-editar" title="Editar">
+            <i class="bi bi-pencil-square"></i>
+        </button>
+
+        <button onclick="excluirRegistro('${registro.id}')" class="button-excluir" title="Excluir">
+            <i class="bi bi-trash3-fill"></i>
+        </button>
+    `;
+
+} else {
+
+    botoesAcao = `<span class="table-status-text">${registro.status === 'Rascunho' ? 'Rascunho' : 'Em Análise'}</span>`;
+
+}
         }
 
         // Renderização das Ações Vinculadas (Compatibilidade)

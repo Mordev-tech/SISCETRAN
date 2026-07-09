@@ -73,6 +73,12 @@
                 </svg>
                 <span>Meus Rascunhos</span>
             </button>
+            <button class="button button-comite" id="btnComite" style="display: none;">
+                <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; display: inline-block; vertical-align: middle;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Avaliação do Comitê</span>
+            </button>
         </div>
 
         <!-- Tabela de Ações Estratégicas -->
@@ -217,7 +223,42 @@
                 </table>
             </div>
         </section>
+
+        <!-- Painel Exclusivo de Avaliação do Comitê -->
+        <section class="comite-container" id="comiteView" style="display: none;">
+            <div class="comite-header">
+                <button class="button button-secondary" id="btnVoltarAcoesDoComite">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem; margin-right: 0.4rem; display: inline-block; vertical-align: middle;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Voltar para Ações</span>
+                </button>
+                <div>
+                    <h2 style="margin-bottom: 0.15rem;">Painel de Avaliação do Comitê</h2>
+                    <p style="color: var(--muted-foreground); margin: 0;">Analise o detalhamento completo de cada ação antes de aprovar ou reprovar.</p>
+                </div>
+            </div>
+
+            <div class="comite-stats-grid" id="comiteStatsGrid"></div>
+
+            <div class="comite-filtros" id="comiteFiltros">
+                <button class="filtro-btn" data-filtro="Enviado">Aguardando Avaliação</button>
+                <button class="filtro-btn" data-filtro="Aprovado">Aprovadas</button>
+                <button class="filtro-btn" data-filtro="Pendente">Aguardando Correção</button>
+                <button class="filtro-btn" data-filtro="Todos">Todas</button>
+            </div>
+
+            <div class="comite-cards-grid" id="comiteCardsContainer"></div>
+        </section>
     </main>
+
+    <!-- Modal de Detalhe e Avaliação da Ação -->
+    <div class="modal" id="modalAvaliacao" style="display: none;">
+        <div class="modal-content modal-avaliacao-content">
+            <span class="close" id="closeModalAvaliacao">&times;</span>
+            <div id="modalAvaliacaoBody"></div>
+        </div>
+    </div>
 
     <footer class="footer">
         <p>&copy; 2026 SISCETRAN. Todos os direitos reservados.</p> 
